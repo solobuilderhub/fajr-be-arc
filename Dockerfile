@@ -81,10 +81,6 @@ USER nodejs
 # Expose the port (Cloud Run uses 8080)
 EXPOSE 8080
 
-# Health check for container orchestration
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD node -e "fetch('http://localhost:8080/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
-
 # Use dumb-init for proper signal handling
 # Run node directly (faster startup than npm start)
 CMD ["dumb-init", "node", "dist/index.js"]
