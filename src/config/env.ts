@@ -35,7 +35,8 @@ if (existsSync(envFile)) {
 } else if (existsSync(defaultEnvFile)) {
   dotenv.config({ path: defaultEnvFile });
   console.log('📄 Loaded: .env');
-} else {
+} else if (env !== 'prod') {
+  // Only warn in non-production; production uses injected env vars
   console.warn('⚠️  No .env file found');
 }
 
