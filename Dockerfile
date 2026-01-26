@@ -4,7 +4,30 @@
 # =============================================================================
 
 # -----------------------------------------------------------------------------
-# Stage 1: Dependencies
+# Stage 1: Build
+# -----------------------------------------------------------------------------
+FROM node:24-slim AS builder
+
+WORKDIR /app
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install all dependencies (including devDependencies for build)
+RUN pnpm install --frozen-lockfile
+
+# Copy source and build
+COPY tsconfig.json ./
+COPY src ./src
+
+# Build TypeScript to dist/
+RUN pnpm run build
+
+# -----------------------------------------------------------------------------
+# Stage 2: Production Dependencies
 # -----------------------------------------------------------------------------
 FROM node:24-slim AS deps
 
@@ -20,7 +43,7 @@ COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 
 # -----------------------------------------------------------------------------
-# Stage 2: Production
+# Stage 3: Production
 # -----------------------------------------------------------------------------
 FROM node:24-slim AS production
 
@@ -43,9 +66,9 @@ WORKDIR /app
 # Copy dependencies from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 
-# Copy application source
+# Copy built application from builder stage
 COPY package.json ./
-COPY src ./src
+COPY --from=builder /app/dist ./dist
 
 # Create non-root user for security
 RUN groupadd --gid 1001 nodejs && \
@@ -64,4 +87,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Use dumb-init for proper signal handling
 # Run node directly (faster startup than npm start)
-CMD ["dumb-init", "node", "src/index.js"]
+CMD ["dumb-init", "node", "dist/index.js"]

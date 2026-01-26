@@ -12,7 +12,7 @@ import {
   softDeletePlugin,
   methodRegistryPlugin,
 } from '@classytic/mongokit';
-import type { ExampleDocument } from './model.js';
+import type { ExampleDocument } from './example.model.js';
 import Example from './example.model.js';
 
 class ExampleRepository extends Repository<ExampleDocument> {

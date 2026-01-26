@@ -10,7 +10,7 @@ import {
   methodRegistryPlugin,
   mongoOperationsPlugin,
 } from '@classytic/mongokit';
-import type { UserDocument } from './model.js';
+import type { UserDocument } from './user.model.js';
 import type { ClientSession, Types } from 'mongoose';
 import User from './user.model.js';
 
