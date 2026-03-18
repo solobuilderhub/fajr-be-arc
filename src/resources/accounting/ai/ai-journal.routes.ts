@@ -176,7 +176,7 @@ const aiJournalRoutes: FastifyPluginAsync = async (fastify) => {
     return {
       success: true,
       data: {
-        journalEntryId: entry._id,
+        journalEntryId: (entry as any)._id,
         status: aiJob?.status ?? 'unknown',
         jobId: aiJob?.jobId ?? null,
         error: aiJob?.error ?? null,

@@ -21,8 +21,8 @@
   },
   "dependencies": {
     "@classytic/arc": "^2.3.0",
-    "@classytic/ledger": "^0.1.0",
-    "@classytic/ledger-ca": "^0.1.0",
+    "@classytic/ledger": "file:../packages/ledger/classytic-ledger-0.1.2.tgz",
+    "@classytic/ledger-ca": "file:../packages/ledger-ca/classytic-ledger-ca-0.1.1.tgz",
     "@classytic/mongokit": "^3.3.2",
     "@classytic/mongoose-slug-plugin": "latest",
     "@classytic/notifications": "^1.2.0",

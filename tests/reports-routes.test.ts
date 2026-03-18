@@ -11,8 +11,8 @@ import '#config/env.js';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import mongoose from 'mongoose';
 import type { FastifyInstance } from 'fastify';
-import { parseDateParams } from './reports.routes.js';
-import { createAppInstance } from '../../../app.js';
+import { parseDateParams } from '../src/resources/accounting/reports/reports.routes.js';
+import { createAppInstance } from '../src/app.js';
 
 // ============================================================================
 // Unit Tests — parseDateParams

@@ -104,8 +104,8 @@ const corRoutes: FastifyPluginAsync = async (fastify) => {
       })),
 
       summary: {
-        balanceSheet: summary.financialSummary.balanceSheet,
-        incomeStatement: summary.financialSummary.incomeStatement,
+        balanceSheet: (summary as any).financialSummary.balanceSheet,
+        incomeStatement: (summary as any).financialSummary.incomeStatement,
         dataQuality: summary.dataQuality,
       },
 
