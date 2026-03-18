@@ -12,6 +12,8 @@ export default defineConfig({
       '#shared': resolve(__dirname, './src/shared'),
       '#resources': resolve(__dirname, './src/resources'),
       '#plugins': resolve(__dirname, './src/plugins'),
+      // Ensure peer deps resolve from this project's node_modules
+      '@classytic/ledger': resolve(__dirname, './node_modules/@classytic/ledger'),
     },
   },
 });

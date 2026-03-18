@@ -2,25 +2,30 @@
  * MongoKit Adapter Factory
  *
  * Creates Arc adapters using MongoKit repositories.
- * The repository handles query parsing via MongoKit's built-in QueryParser.
+ * Uses MongoKit's buildCrudSchemasFromModel as the schema generator
+ * for rich OpenAPI documentation (nested objects, enums, validators).
  */
 
 import { createMongooseAdapter } from '@classytic/arc';
+import type { OpenApiSchemas } from '@classytic/arc/types';
+import { buildCrudSchemasFromModel } from '@classytic/mongokit';
 import type { Model } from 'mongoose';
 import type { Repository } from '@classytic/mongokit';
 
 /**
- * Create a MongoKit-powered adapter for a resource
+ * Create a MongoKit-powered adapter for a resource.
  *
- * Note: Query parsing is handled by MongoKit's Repository class.
- * Just pass the model and repository - Arc handles the rest.
+ * Plugs in MongoKit's schema generator for proper OpenAPI docs
+ * (handles nested objects, enums, field rules, validators).
  */
-export function createAdapter<TDoc, TRepo extends Repository<TDoc>>(
-  model: Model<TDoc>,
-  repository: TRepo
-): ReturnType<typeof createMongooseAdapter> {
+export function createAdapter(
+  model: Model<any>,
+  repository: Repository<any>,
+) {
   return createMongooseAdapter({
     model,
     repository,
+    schemaGenerator: (m, options) =>
+      buildCrudSchemasFromModel(m, options) as OpenApiSchemas,
   });
 }

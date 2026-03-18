@@ -22,7 +22,6 @@ export { flexibleMultiTenantPreset } from './flexible-multi-tenant.js';
  */
 export const orgScoped = multiTenantPreset({
   tenantField: 'organizationId',
-  bypassRoles: ['superadmin', 'admin'],
 });
 
 /**

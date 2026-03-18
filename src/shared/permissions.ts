@@ -8,6 +8,7 @@ import {
   requireAuth,
   requireRoles,
   requireOwnership,
+  requireOrgRole,
   allowPublic,
   anyOf,
   allOf,
@@ -22,6 +23,7 @@ export {
   requireAuth,
   requireRoles,
   requireOwnership,
+  requireOrgRole,
   allOf,
   anyOf,
   denyAll,
@@ -29,53 +31,42 @@ export {
 };
 
 // ============================================================================
-// Permission Helpers
+// Platform-Level Permission Helpers (user.role — superadmin, admin, user)
 // ============================================================================
 
-/**
- * Require any authenticated user
- */
+/** Require any authenticated user */
 export const requireAuthenticated = (): PermissionCheck =>
   requireRoles(['user', 'admin', 'superadmin']);
 
-/**
- * Require admin or superadmin
- */
+/** Require platform admin or superadmin */
 export const requireAdmin = (): PermissionCheck =>
   requireRoles(['admin', 'superadmin']);
 
-/**
- * Require superadmin only
- */
+/** Require platform superadmin only */
 export const requireSuperadmin = (): PermissionCheck =>
   requireRoles(['superadmin']);
 
-/**
- * Require organization owner
- */
+// ============================================================================
+// Org-Level Permission Helpers (scope.orgRoles — admin, staff, member)
+// ============================================================================
+
+/** Require org admin (owner-level) */
 export const requireOrgOwner = (): PermissionCheck =>
-  requireRoles(['owner'], { bypassRoles: ['admin', 'superadmin'] });
+  requireOrgRole(['admin']);
 
-/**
- * Require organization manager or higher
- */
+/** Require org admin or staff (manager-level) */
 export const requireOrgManager = (): PermissionCheck =>
-  requireRoles(['owner', 'manager'], { bypassRoles: ['admin', 'superadmin'] });
+  requireOrgRole(['admin', 'staff']);
 
-/**
- * Require organization staff (any org member)
- */
+/** Require any org member (staff-level read access) */
 export const requireOrgStaff = (): PermissionCheck =>
-  requireRoles(['owner', 'manager', 'staff'], { bypassRoles: ['admin', 'superadmin'] });
+  requireOrgRole(['admin', 'staff', 'member']);
 
 // ============================================================================
 // Standard Permission Sets
 // ============================================================================
 
-/**
- * Public read, authenticated write (default for most resources)
- * Uses requireAuth() - just checks if logged in, no role check
- */
+/** Public read, authenticated write */
 export const publicReadPermissions = {
   list: allowPublic(),
   get: allowPublic(),
@@ -84,9 +75,7 @@ export const publicReadPermissions = {
   delete: requireAuth(),
 };
 
-/**
- * All operations require authentication
- */
+/** All operations require authentication */
 export const authenticatedPermissions = {
   list: requireAuth(),
   get: requireAuth(),
@@ -95,9 +84,7 @@ export const authenticatedPermissions = {
   delete: requireAuth(),
 };
 
-/**
- * Admin only permissions
- */
+/** Admin only permissions */
 export const adminPermissions = {
   list: requireAdmin(),
   get: requireAdmin(),
@@ -106,13 +93,42 @@ export const adminPermissions = {
   delete: requireSuperadmin(),
 };
 
-/**
- * Organization staff permissions
- */
+/** Organization staff permissions */
 export const orgStaffPermissions = {
   list: requireOrgStaff(),
   get: requireOrgStaff(),
   create: requireOrgManager(),
   update: requireOrgManager(),
   delete: requireOrgOwner(),
+};
+
+// ============================================================================
+// Accounting Permissions
+// ============================================================================
+
+/** Accounting resource permissions (any member reads, admin+staff writes, admin deletes) */
+export const accountingPermissions = {
+  list: requireOrgStaff(),
+  get: requireOrgStaff(),
+  create: requireOrgManager(),
+  update: requireOrgManager(),
+  delete: requireOrgOwner(),
+};
+
+/** Report permissions (read-only for any org member) */
+export const reportPermissions = {
+  list: requireOrgStaff(),
+  get: requireOrgStaff(),
+  create: denyAll(),
+  update: denyAll(),
+  delete: denyAll(),
+};
+
+/** Fiscal period permissions (admin-only management) */
+export const fiscalPeriodPermissions = {
+  list: requireOrgStaff(),
+  get: requireOrgStaff(),
+  create: requireOrgOwner(),
+  update: requireOrgOwner(),
+  delete: denyAll(),
 };

@@ -7,17 +7,23 @@
 
 export interface AppConfig {
   env: string;
+  isDev: boolean;
+  isProd: boolean;
   server: {
     port: number;
     host: string;
   };
-  jwt: {
+  betterAuth: {
     secret: string;
-    refreshSecret: string;
-    expiresIn: string;
+  };
+  frontend: {
+    url: string;
   };
   cors: {
     origins: string[] | true;
+    methods: string[];
+    allowedHeaders: string[];
+    credentials: boolean;
   };
   database: {
     uri: string;
@@ -29,16 +35,22 @@ export interface AppConfig {
 
 const config: AppConfig = {
   env: process.env.NODE_ENV || 'development',
+  isDev: (process.env.NODE_ENV || 'development') !== 'production',
+  isProd: process.env.NODE_ENV === 'production',
 
   server: {
     port: parseInt(process.env.PORT || '8040', 10),
     host: process.env.HOST || '0.0.0.0',
   },
 
-  jwt: {
-    secret: process.env.JWT_SECRET || 'dev-secret-change-in-production-min-32',
-    refreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-change-in-production-min-32',
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+  betterAuth: {
+    secret:
+      process.env.BETTER_AUTH_SECRET ||
+      'dev-secret-change-in-production-minimum-32-chars-long',
+  },
+
+  frontend: {
+    url: process.env.FRONTEND_URL || 'http://localhost:3000',
   },
 
   cors: {
@@ -46,10 +58,13 @@ const config: AppConfig = {
       process.env.CORS_ORIGINS === '*'
         ? true
         : (process.env.CORS_ORIGINS || 'http://localhost:3000').split(','),
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-organization-id'],
+    credentials: true,
   },
 
   database: {
-    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/fajr-be-arc',
+    uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/fajr',
   },
 
   org: {

@@ -8,7 +8,7 @@
 import type { FastifyInstance } from 'fastify';
 import type { AppConfig } from '../config/index.js';
 import { openApiPlugin, scalarPlugin } from '@classytic/arc/docs';
-import { orgScopePlugin } from '@classytic/arc/org';
+import { organizationPlugin } from '@classytic/arc/org';
 
 /**
  * Register all app-specific plugins
@@ -36,10 +36,9 @@ export async function registerPlugins(
   });
 
   // Multi-tenant org scope
-  await app.register(orgScopePlugin, {
-    header: config.org?.header || 'x-organization-id',
-    bypassRoles: ['superadmin', 'admin'],
-  });
+  // organizationPlugin requires an adapter — registered via Better Auth in app.ts
+  // Uncomment when org adapter is wired:
+  // await app.register(organizationPlugin, { adapter: orgAdapter });
 
   // Add your custom plugins here:
   // await app.register(myCustomPlugin, { ...options });

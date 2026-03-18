@@ -2,33 +2,46 @@
  * Resources Registry
  *
  * Central registry for all API resources.
- * Flat structure - no barrels, direct imports.
+ * All resources are mounted under /api prefix.
+ *
+ * Resources with state transitions or custom routes
+ * use plugins that combine CRUD + action routers.
  */
 
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance } from 'fastify';
 
-// Auth resources (register, login, /users/me)
-import { authResource, userProfileResource } from "./auth/auth.resource.js";
+// Simple CRUD resources
+import directoryResource from './directory/directory.resource.js';
+import orgProfileResource from './org-profile/org-profile.resource.js';
 
-// App resources
-import directoryResource from "./directory/directory.resource.js";
-// Add more resources here:
-// import productResource from './product/product.resource.js';
+// Plugin-based resources (CRUD + action routers / reports)
+import { accountingPlugin } from './accounting/accounting.plugin.js';
 
-/**
- * All registered resources
- */
-export const resources = [
-  authResource,
-  userProfileResource,
-  directoryResource,
-] as const;
+/** Simple CRUD resources (registered via .toPlugin()) */
+export const resources = [directoryResource, orgProfileResource] as const;
+
+/** Plugin-based resources (CRUD + custom routes) */
+const plugins = [accountingPlugin] as const;
 
 /**
  * Register all resources with the app
  */
-export async function registerResources(app: FastifyInstance): Promise<void> {
-  for (const resource of resources) {
-    await app.register(resource.toPlugin());
-  }
+export async function registerResources(
+  app: FastifyInstance,
+  prefix = '/api',
+): Promise<void> {
+  await app.register(
+    async (scope) => {
+      // Register simple CRUD resources
+      for (const resource of resources) {
+        await scope.register(resource.toPlugin());
+      }
+
+      // Register plugin-based resources
+      for (const plugin of plugins) {
+        await scope.register(plugin);
+      }
+    },
+    { prefix },
+  );
 }
