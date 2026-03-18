@@ -15,7 +15,11 @@ import { adminAc, userAc } from 'better-auth/plugins/admin/access';
 import config from '#config/index.js';
 import { ac, admin, staff, member } from './access-control.js';
 import { cleanupOrganizationData } from './org-cleanup.js';
-import { sendResetPasswordEmail, sendInvitationEmail } from './email.js';
+import {
+  sendResetPasswordEmail,
+  sendInvitationEmail,
+  sendChangeEmailVerification,
+} from './email.js';
 
 let _auth: any = null;
 
@@ -47,6 +51,15 @@ export function getAuth() {
             required: false,
             input: false,
           },
+        },
+        changeEmail: {
+          enabled: true,
+          sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+            await sendChangeEmailVerification(user, newEmail, url);
+          },
+        },
+        deleteUser: {
+          enabled: true,
         },
       },
 

@@ -68,6 +68,45 @@ export async function sendResetPasswordEmail(user: { email: string; name: string
 }
 
 /**
+ * Send email change verification
+ */
+export async function sendChangeEmailVerification(
+  user: { email: string; name: string },
+  newEmail: string,
+  url: string,
+) {
+  const ns = getNotifications();
+  if (!ns) {
+    console.log(`[email] Email change verification for ${user.email} → ${newEmail}: ${url}`);
+    return;
+  }
+
+  await ns.send({
+    event: 'auth.change-email',
+    recipient: { email: newEmail, name: user.name },
+    data: {
+      subject: 'Verify your new email — Fajr',
+      html: `
+        <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
+          <h2>Email Change Verification</h2>
+          <p>Hi ${user.name || 'there'},</p>
+          <p>You requested to change your email from <strong>${user.email}</strong> to <strong>${newEmail}</strong>.</p>
+          <p>Click the button below to verify your new email address:</p>
+          <p style="text-align: center; margin: 32px 0;">
+            <a href="${url}" style="background: #18181b; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; display: inline-block;">
+              Verify New Email
+            </a>
+          </p>
+          <p style="color: #666; font-size: 14px;">If you didn't request this, you can safely ignore this email.</p>
+        </div>
+      `,
+    },
+  });
+
+  console.log(`[email] Email change verification sent to ${newEmail}`);
+}
+
+/**
  * Send organization invitation email
  */
 export async function sendInvitationEmail(data: {
