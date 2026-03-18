@@ -54,7 +54,7 @@ export function getAuth() {
         },
         changeEmail: {
           enabled: true,
-          sendChangeEmailVerification: async ({ user, newEmail, url }) => {
+          sendChangeEmailVerification: async ({ user, newEmail, url }: { user: { email: string; name: string }; newEmail: string; url: string }) => {
             await sendChangeEmailVerification(user, newEmail, url);
           },
         },
